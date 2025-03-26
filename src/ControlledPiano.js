@@ -147,6 +147,16 @@ class ControlledPiano extends React.Component {
     });
   };
 
+  onMouseEnter = (event) => {
+    // When re-entering the piano area, check if the mouse button is still down
+    // If not, make sure we're not in gliss mode
+    if (!event.buttons) {
+      this.setState({
+        isMouseDown: false,
+      });
+    }
+  };
+
   onTouchStart = () => {
     this.setState({
       useTouchEvents: true,
@@ -164,6 +174,7 @@ class ControlledPiano extends React.Component {
         style={{ width: '100%', height: '100%' }}
         onMouseDown={this.onMouseDown}
         onMouseUp={this.onMouseUp}
+        onMouseEnter={this.onMouseEnter}
         onTouchStart={this.onTouchStart}
         data-testid="container"
       >
