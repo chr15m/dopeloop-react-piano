@@ -348,6 +348,8 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       var _this$props = this.props,
           naturalKeyWidth = _this$props.naturalKeyWidth,
           accidentalWidthRatio = _this$props.accidentalWidthRatio,
@@ -373,12 +375,20 @@ function (_React$Component) {
         },
         onMouseDown: useTouchEvents ? null : this.onPlayNoteInput,
         onMouseUp: useTouchEvents ? null : this.onStopNoteInput,
-        onMouseEnter: gliss ? this.onPlayNoteInput : null,
+        onMouseEnter: gliss ? function (event) {
+          if (event.buttons) {
+            _this2.onPlayNoteInput();
+          }
+        } : null,
         onMouseLeave: this.onStopNoteInput,
         onPointerDown: useTouchEvents ? function (ev) {
           ev.target.releasePointerCapture(ev.pointerId);
         } : null,
-        onPointerEnter: useTouchEvents ? this.onPlayNoteInput : null,
+        onPointerEnter: useTouchEvents ? function (event) {
+          if (event.buttons) {
+            _this2.onPlayNoteInput();
+          }
+        } : null,
         onPointerLeave: useTouchEvents ? this.onStopNoteInput : null,
         onTouchStart: useTouchEvents ? this.onPlayNoteInput : null,
         onTouchCancel: useTouchEvents ? this.onStopNoteInput : null,
@@ -691,6 +701,16 @@ function (_React$Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_this), "onMouseEnter", function (event) {
+      // When re-entering the piano area, check if the mouse button is still down
+      // If not, make sure we're not in gliss mode
+      if (!event.buttons) {
+        _this.setState({
+          isMouseDown: false
+        });
+      }
+    });
+
     _defineProperty(_assertThisInitialized(_this), "onTouchStart", function () {
       _this.setState({
         useTouchEvents: true
@@ -749,6 +769,7 @@ function (_React$Component) {
         },
         onMouseDown: this.onMouseDown,
         onMouseUp: this.onMouseUp,
+        onMouseEnter: this.onMouseEnter,
         onTouchStart: this.onTouchStart,
         "data-testid": "container"
       }, React.createElement(Keyboard, {
