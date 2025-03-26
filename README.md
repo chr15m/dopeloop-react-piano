@@ -40,6 +40,7 @@ function App() {
     lastNote: lastNote,
     keyboardConfig: KeyboardShortcuts.HOME_ROW,
   });
+  // This maps physical key positions to notes, regardless of keyboard layout
 
   return (
     <Piano
@@ -74,7 +75,7 @@ react-piano does not implement audio playback of each note, so you have to imple
 | `renderNoteLabel` | Function | `({ keyboardShortcut, midiNumber, isActive, isAccidental }) => node` function to render a label on piano keys that have keyboard shortcuts |
 | `className` | String | A className to add to the component. |
 | `disabled` | Boolean | Whether to show disabled state. Useful when audio sounds need to be asynchronously loaded. |
-| `keyboardShortcuts` | Array of object | An array of form `[{ key: 'a', midiNumber: 48 }, ...]`, where `key` is a `keyEvent.key` value. You can generate this using `KeyboardShortcuts.create`, or use your own method to generate it. You can omit it if you don't want to use keyboard shortcuts. **Note:** this shouldn't be generated inline in JSX because it can cause problems when diffing for shortcut changes. |
+| `keyboardShortcuts` | Array of object | An array of form `[{ code: 'KeyA', midiNumber: 48 }, ...]`, where `code` is a `keyEvent.code` value representing the physical key position. You can generate this using `KeyboardShortcuts.create`, or use your own method to generate it. You can omit it if you don't want to use keyboard shortcuts. **Note:** this shouldn't be generated inline in JSX because it can cause problems when diffing for shortcut changes. |
 | `onPlayNoteInput` | Function | `(midiNumber, { prevActiveNotes }) => void` function that fires whenever a play-note event is fired. Can use `prevActiveNotes` to record notes. |
 | `onStopNoteInput` | Function | `(midiNumber, { prevActiveNotes }) => void` function that fires whenever a stop-note event is fired. Can use `prevActiveNotes` to record notes. |
 
@@ -83,6 +84,29 @@ react-piano does not implement audio playback of each note, so you have to imple
 You can "record" notes that are played on a `<Piano>` by using `onPlayNoteInput` or `onStopNoteInput`, and you can then play back the recording by using `activeNotes`. See [this CodeSandbox](https://codesandbox.io/s/l4jjvzmp47) which demonstrates how to set that up.
 
 <a href="https://codesandbox.io/s/l4jjvzmp47"><img width="300" src="/demo/public/images/recording-demo.gif" alt="demo of recording" /></a>
+
+## Keyboard Layouts
+
+react-piano uses `event.code` instead of `event.key` for keyboard shortcuts, which means it maps to physical key positions rather than the characters produced by those keys. This makes the piano playable with the same physical key positions regardless of keyboard layout (QWERTY, AZERTY, Dvorak, etc.).
+
+The predefined configurations use standard key codes that correspond to physical positions on the keyboard:
+
+- `KeyboardShortcuts.HOME_ROW`: Uses the home row keys (A-L)
+- `KeyboardShortcuts.BOTTOM_ROW`: Uses the bottom row keys (Z-/)
+- `KeyboardShortcuts.QWERTY_ROW`: Uses the number row keys (Q-[)
+- `KeyboardShortcuts.PIANO_LAYOUT`: Maps keys to resemble a piano layout where:
+  - White keys: Z, X, C, V, B, N, M
+  - Black keys: S, D, G, H, J
+
+Example using the piano-like layout:
+
+```jsx
+const keyboardShortcuts = KeyboardShortcuts.create({
+  firstNote: MidiNumbers.fromNote('c3'),
+  lastNote: MidiNumbers.fromNote('c4'),
+  keyboardConfig: KeyboardShortcuts.PIANO_LAYOUT,
+});
+```
 
 ## Customizing styles
 

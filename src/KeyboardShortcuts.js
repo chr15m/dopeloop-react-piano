@@ -1,5 +1,10 @@
 import MidiNumbers from './MidiNumbers';
 
+/**
+ * Create keyboard shortcuts based on physical key positions using event.code
+ * This makes the piano playable with the same physical key positions
+ * regardless of keyboard layout (QWERTY, AZERTY, Dvorak, etc.)
+ */
 function createKeyboardShortcuts({ firstNote, lastNote, keyboardConfig }) {
   let currentMidiNumber = firstNote;
   let naturalKeyIndex = 0;
@@ -11,16 +16,16 @@ function createKeyboardShortcuts({ firstNote, lastNote, keyboardConfig }) {
     // Note to be assigned does not surpass range
     currentMidiNumber <= lastNote
   ) {
-    const key = keyboardConfig[naturalKeyIndex];
+    const keyCode = keyboardConfig[naturalKeyIndex];
     const { isAccidental } = MidiNumbers.getAttributes(currentMidiNumber);
     if (isAccidental) {
       keyboardShortcuts.push({
-        key: key.flat,
+        code: keyCode.flat,
         midiNumber: currentMidiNumber,
       });
     } else {
       keyboardShortcuts.push({
-        key: key.natural,
+        code: keyCode.natural,
         midiNumber: currentMidiNumber,
       });
       naturalKeyIndex += 1;
@@ -32,43 +37,53 @@ function createKeyboardShortcuts({ firstNote, lastNote, keyboardConfig }) {
 
 export default {
   create: createKeyboardShortcuts,
-  // Preset configurations
+  // Preset configurations using KeyboardEvent.code values
+  // These represent physical key positions regardless of keyboard layout
+  PIANO_LAYOUT: [
+    { natural: 'KeyZ', flat: null, sharp: 'KeyS' },
+    { natural: 'KeyX', flat: 'KeyS', sharp: 'KeyD' },
+    { natural: 'KeyC', flat: 'KeyD', sharp: null },
+    { natural: 'KeyV', flat: null, sharp: 'KeyG' },
+    { natural: 'KeyB', flat: 'KeyG', sharp: 'KeyH' },
+    { natural: 'KeyN', flat: 'KeyH', sharp: 'KeyJ' },
+    { natural: 'KeyM', flat: 'KeyJ', sharp: null },
+  ],
   BOTTOM_ROW: [
-    { natural: 'z', flat: 'a', sharp: 's' },
-    { natural: 'x', flat: 's', sharp: 'd' },
-    { natural: 'c', flat: 'd', sharp: 'f' },
-    { natural: 'v', flat: 'f', sharp: 'g' },
-    { natural: 'b', flat: 'g', sharp: 'h' },
-    { natural: 'n', flat: 'h', sharp: 'j' },
-    { natural: 'm', flat: 'j', sharp: 'k' },
-    { natural: ',', flat: 'k', sharp: 'l' },
-    { natural: '.', flat: 'l', sharp: ';' },
-    { natural: '/', flat: ';', sharp: "'" },
+    { natural: 'KeyZ', flat: 'KeyA', sharp: 'KeyS' },
+    { natural: 'KeyX', flat: 'KeyS', sharp: 'KeyD' },
+    { natural: 'KeyC', flat: 'KeyD', sharp: 'KeyF' },
+    { natural: 'KeyV', flat: 'KeyF', sharp: 'KeyG' },
+    { natural: 'KeyB', flat: 'KeyG', sharp: 'KeyH' },
+    { natural: 'KeyN', flat: 'KeyH', sharp: 'KeyJ' },
+    { natural: 'KeyM', flat: 'KeyJ', sharp: 'KeyK' },
+    { natural: 'Comma', flat: 'KeyK', sharp: 'KeyL' },
+    { natural: 'Period', flat: 'KeyL', sharp: 'Semicolon' },
+    { natural: 'Slash', flat: 'Semicolon', sharp: 'Quote' },
   ],
   HOME_ROW: [
-    { natural: 'a', flat: 'q', sharp: 'w' },
-    { natural: 's', flat: 'w', sharp: 'e' },
-    { natural: 'd', flat: 'e', sharp: 'r' },
-    { natural: 'f', flat: 'r', sharp: 't' },
-    { natural: 'g', flat: 't', sharp: 'y' },
-    { natural: 'h', flat: 'y', sharp: 'u' },
-    { natural: 'j', flat: 'u', sharp: 'i' },
-    { natural: 'k', flat: 'i', sharp: 'o' },
-    { natural: 'l', flat: 'o', sharp: 'p' },
-    { natural: ';', flat: 'p', sharp: '[' },
-    { natural: "'", flat: '[', sharp: ']' },
+    { natural: 'KeyA', flat: 'KeyQ', sharp: 'KeyW' },
+    { natural: 'KeyS', flat: 'KeyW', sharp: 'KeyE' },
+    { natural: 'KeyD', flat: 'KeyE', sharp: 'KeyR' },
+    { natural: 'KeyF', flat: 'KeyR', sharp: 'KeyT' },
+    { natural: 'KeyG', flat: 'KeyT', sharp: 'KeyY' },
+    { natural: 'KeyH', flat: 'KeyY', sharp: 'KeyU' },
+    { natural: 'KeyJ', flat: 'KeyU', sharp: 'KeyI' },
+    { natural: 'KeyK', flat: 'KeyI', sharp: 'KeyO' },
+    { natural: 'KeyL', flat: 'KeyO', sharp: 'KeyP' },
+    { natural: 'Semicolon', flat: 'KeyP', sharp: 'BracketLeft' },
+    { natural: 'Quote', flat: 'BracketLeft', sharp: 'BracketRight' },
   ],
   QWERTY_ROW: [
-    { natural: 'q', flat: '1', sharp: '2' },
-    { natural: 'w', flat: '2', sharp: '3' },
-    { natural: 'e', flat: '3', sharp: '4' },
-    { natural: 'r', flat: '4', sharp: '5' },
-    { natural: 't', flat: '5', sharp: '6' },
-    { natural: 'y', flat: '6', sharp: '7' },
-    { natural: 'u', flat: '7', sharp: '8' },
-    { natural: 'i', flat: '8', sharp: '9' },
-    { natural: 'o', flat: '9', sharp: '0' },
-    { natural: 'p', flat: '0', sharp: '-' },
-    { natural: '[', flat: '-', sharp: '=' },
+    { natural: 'KeyQ', flat: 'Digit1', sharp: 'Digit2' },
+    { natural: 'KeyW', flat: 'Digit2', sharp: 'Digit3' },
+    { natural: 'KeyE', flat: 'Digit3', sharp: 'Digit4' },
+    { natural: 'KeyR', flat: 'Digit4', sharp: 'Digit5' },
+    { natural: 'KeyT', flat: 'Digit5', sharp: 'Digit6' },
+    { natural: 'KeyY', flat: 'Digit6', sharp: 'Digit7' },
+    { natural: 'KeyU', flat: 'Digit7', sharp: 'Digit8' },
+    { natural: 'KeyI', flat: 'Digit8', sharp: 'Digit9' },
+    { natural: 'KeyO', flat: 'Digit9', sharp: 'Digit0' },
+    { natural: 'KeyP', flat: 'Digit0', sharp: 'Minus' },
+    { natural: 'BracketLeft', flat: 'Minus', sharp: 'Equal' },
   ],
 };

@@ -7,17 +7,17 @@ describe('create', () => {
       lastNote: 50,
       keyboardConfig: [
         {
-          natural: 's',
-          flat: 'w',
+          natural: 'KeyS',
+          flat: 'KeyW',
         },
         {
-          natural: 'd',
-          flat: 'e',
+          natural: 'KeyD',
+          flat: 'KeyE',
         },
       ],
     });
 
-    expect(keyboardShortcuts).toEqual([{ key: 's', midiNumber: 40 }, { key: 'd', midiNumber: 41 }]);
+    expect(keyboardShortcuts).toEqual([{ code: 'KeyS', midiNumber: 40 }, { code: 'KeyD', midiNumber: 41 }]);
   });
   test('does not create shortcuts exceeding lastNote', () => {
     const keyboardShortcuts = KeyboardShortcuts.create({
@@ -25,20 +25,20 @@ describe('create', () => {
       lastNote: 41,
       keyboardConfig: [
         {
-          natural: 's',
-          flat: 'w',
+          natural: 'KeyS',
+          flat: 'KeyW',
         },
         {
-          natural: 'd',
-          flat: 'e',
+          natural: 'KeyD',
+          flat: 'KeyE',
         },
         {
-          natural: 'f',
-          flat: 'r',
+          natural: 'KeyF',
+          flat: 'KeyR',
         },
       ],
     });
 
-    expect(keyboardShortcuts).toEqual([{ key: 's', midiNumber: 40 }, { key: 'd', midiNumber: 41 }]);
+    expect(keyboardShortcuts).toEqual([{ code: 'KeyS', midiNumber: 40 }, { code: 'KeyD', midiNumber: 41 }]);
   });
 });

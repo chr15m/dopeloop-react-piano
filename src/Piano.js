@@ -20,7 +20,7 @@ class Piano extends React.Component {
     keyWidthToHeight: PropTypes.number,
     keyboardShortcuts: PropTypes.arrayOf(
       PropTypes.shape({
-        key: PropTypes.string.isRequired,
+        code: PropTypes.string.isRequired,
         midiNumber: PropTypes.number.isRequired,
       }),
     ),

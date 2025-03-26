@@ -19,7 +19,7 @@ class ControlledPiano extends React.Component {
     keyWidthToHeight: PropTypes.number,
     keyboardShortcuts: PropTypes.arrayOf(
       PropTypes.shape({
-        key: PropTypes.string.isRequired,
+        code: PropTypes.string.isRequired,
         midiNumber: PropTypes.number.isRequired,
       }),
     ),
@@ -80,11 +80,11 @@ class ControlledPiano extends React.Component {
     });
   };
 
-  getMidiNumberForKey = (key) => {
+  getMidiNumberForKey = (code) => {
     if (!this.props.keyboardShortcuts) {
       return null;
     }
-    const shortcut = this.props.keyboardShortcuts.find((sh) => sh.key === key);
+    const shortcut = this.props.keyboardShortcuts.find((sh) => sh.code === code);
     return shortcut && shortcut.midiNumber;
   };
 
@@ -93,7 +93,7 @@ class ControlledPiano extends React.Component {
       return null;
     }
     const shortcut = this.props.keyboardShortcuts.find((sh) => sh.midiNumber === midiNumber);
-    return shortcut && shortcut.key;
+    return shortcut && shortcut.code;
   };
 
   onKeyDown = (event) => {
@@ -101,7 +101,7 @@ class ControlledPiano extends React.Component {
     if (event.ctrlKey || event.metaKey || event.shiftKey) {
       return;
     }
-    const midiNumber = this.getMidiNumberForKey(event.key);
+    const midiNumber = this.getMidiNumberForKey(event.code);
     if (midiNumber) {
       this.onPlayNoteInput(midiNumber);
     }
@@ -113,7 +113,7 @@ class ControlledPiano extends React.Component {
     // ctrlKey is fired unexpectedly, which would cause onStopNote to NOT be fired, which causes problematic
     // lingering notes. Since it's fairly safe to call onStopNote even when not necessary,
     // the ctrl/meta/shift check is removed to fix that issue.
-    const midiNumber = this.getMidiNumberForKey(event.key);
+    const midiNumber = this.getMidiNumberForKey(event.code);
     if (midiNumber) {
       this.onStopNoteInput(midiNumber);
     }

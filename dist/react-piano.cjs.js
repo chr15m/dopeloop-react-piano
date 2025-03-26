@@ -621,13 +621,13 @@ function (_React$Component) {
       });
     });
 
-    _defineProperty(_assertThisInitialized(_this), "getMidiNumberForKey", function (key) {
+    _defineProperty(_assertThisInitialized(_this), "getMidiNumberForKey", function (code) {
       if (!_this.props.keyboardShortcuts) {
         return null;
       }
 
       var shortcut = _this.props.keyboardShortcuts.find(function (sh) {
-        return sh.key === key;
+        return sh.code === code;
       });
 
       return shortcut && shortcut.midiNumber;
@@ -642,7 +642,7 @@ function (_React$Component) {
         return sh.midiNumber === midiNumber;
       });
 
-      return shortcut && shortcut.key;
+      return shortcut && shortcut.code;
     });
 
     _defineProperty(_assertThisInitialized(_this), "onKeyDown", function (event) {
@@ -651,7 +651,7 @@ function (_React$Component) {
         return;
       }
 
-      var midiNumber = _this.getMidiNumberForKey(event.key);
+      var midiNumber = _this.getMidiNumberForKey(event.code);
 
       if (midiNumber) {
         _this.onPlayNoteInput(midiNumber);
@@ -664,7 +664,7 @@ function (_React$Component) {
       // ctrlKey is fired unexpectedly, which would cause onStopNote to NOT be fired, which causes problematic
       // lingering notes. Since it's fairly safe to call onStopNote even when not necessary,
       // the ctrl/meta/shift check is removed to fix that issue.
-      var midiNumber = _this.getMidiNumberForKey(event.key);
+      var midiNumber = _this.getMidiNumberForKey(event.code);
 
       if (midiNumber) {
         _this.onStopNoteInput(midiNumber);
@@ -804,7 +804,7 @@ _defineProperty(ControlledPiano, "propTypes", {
   width: PropTypes.number,
   keyWidthToHeight: PropTypes.number,
   keyboardShortcuts: PropTypes.arrayOf(PropTypes.shape({
-    key: PropTypes.string.isRequired,
+    code: PropTypes.string.isRequired,
     midiNumber: PropTypes.number.isRequired
   }))
 });
@@ -933,10 +933,16 @@ _defineProperty(Piano, "propTypes", {
   width: PropTypes.number,
   keyWidthToHeight: PropTypes.number,
   keyboardShortcuts: PropTypes.arrayOf(PropTypes.shape({
-    key: PropTypes.string.isRequired,
+    code: PropTypes.string.isRequired,
     midiNumber: PropTypes.number.isRequired
   }))
 });
+
+/**
+ * Create keyboard shortcuts based on physical key positions using event.code
+ * This makes the piano playable with the same physical key positions
+ * regardless of keyboard layout (QWERTY, AZERTY, Dvorak, etc.)
+ */
 
 function createKeyboardShortcuts(_ref) {
   var firstNote = _ref.firstNote,
@@ -949,19 +955,19 @@ function createKeyboardShortcuts(_ref) {
   while ( // There are still keys to be assigned
   naturalKeyIndex < keyboardConfig.length && // Note to be assigned does not surpass range
   currentMidiNumber <= lastNote) {
-    var key = keyboardConfig[naturalKeyIndex];
+    var keyCode = keyboardConfig[naturalKeyIndex];
 
     var _MidiNumbers$getAttri = MidiNumbers.getAttributes(currentMidiNumber),
         isAccidental = _MidiNumbers$getAttri.isAccidental;
 
     if (isAccidental) {
       keyboardShortcuts.push({
-        key: key.flat,
+        code: keyCode.flat,
         midiNumber: currentMidiNumber
       });
     } else {
       keyboardShortcuts.push({
-        key: key.natural,
+        code: keyCode.natural,
         midiNumber: currentMidiNumber
       });
       naturalKeyIndex += 1;
@@ -975,137 +981,167 @@ function createKeyboardShortcuts(_ref) {
 
 var KeyboardShortcuts = {
   create: createKeyboardShortcuts,
-  // Preset configurations
+  // Preset configurations using KeyboardEvent.code values
+  // These represent physical key positions regardless of keyboard layout
+  PIANO_LAYOUT: [{
+    natural: 'KeyZ',
+    flat: null,
+    sharp: 'KeyS'
+  }, {
+    natural: 'KeyX',
+    flat: 'KeyS',
+    sharp: 'KeyD'
+  }, {
+    natural: 'KeyC',
+    flat: 'KeyD',
+    sharp: null
+  }, {
+    natural: 'KeyV',
+    flat: null,
+    sharp: 'KeyG'
+  }, {
+    natural: 'KeyB',
+    flat: 'KeyG',
+    sharp: 'KeyH'
+  }, {
+    natural: 'KeyN',
+    flat: 'KeyH',
+    sharp: 'KeyJ'
+  }, {
+    natural: 'KeyM',
+    flat: 'KeyJ',
+    sharp: null
+  }],
   BOTTOM_ROW: [{
-    natural: 'z',
-    flat: 'a',
-    sharp: 's'
+    natural: 'KeyZ',
+    flat: 'KeyA',
+    sharp: 'KeyS'
   }, {
-    natural: 'x',
-    flat: 's',
-    sharp: 'd'
+    natural: 'KeyX',
+    flat: 'KeyS',
+    sharp: 'KeyD'
   }, {
-    natural: 'c',
-    flat: 'd',
-    sharp: 'f'
+    natural: 'KeyC',
+    flat: 'KeyD',
+    sharp: 'KeyF'
   }, {
-    natural: 'v',
-    flat: 'f',
-    sharp: 'g'
+    natural: 'KeyV',
+    flat: 'KeyF',
+    sharp: 'KeyG'
   }, {
-    natural: 'b',
-    flat: 'g',
-    sharp: 'h'
+    natural: 'KeyB',
+    flat: 'KeyG',
+    sharp: 'KeyH'
   }, {
-    natural: 'n',
-    flat: 'h',
-    sharp: 'j'
+    natural: 'KeyN',
+    flat: 'KeyH',
+    sharp: 'KeyJ'
   }, {
-    natural: 'm',
-    flat: 'j',
-    sharp: 'k'
+    natural: 'KeyM',
+    flat: 'KeyJ',
+    sharp: 'KeyK'
   }, {
-    natural: ',',
-    flat: 'k',
-    sharp: 'l'
+    natural: 'Comma',
+    flat: 'KeyK',
+    sharp: 'KeyL'
   }, {
-    natural: '.',
-    flat: 'l',
-    sharp: ';'
+    natural: 'Period',
+    flat: 'KeyL',
+    sharp: 'Semicolon'
   }, {
-    natural: '/',
-    flat: ';',
-    sharp: "'"
+    natural: 'Slash',
+    flat: 'Semicolon',
+    sharp: 'Quote'
   }],
   HOME_ROW: [{
-    natural: 'a',
-    flat: 'q',
-    sharp: 'w'
+    natural: 'KeyA',
+    flat: 'KeyQ',
+    sharp: 'KeyW'
   }, {
-    natural: 's',
-    flat: 'w',
-    sharp: 'e'
+    natural: 'KeyS',
+    flat: 'KeyW',
+    sharp: 'KeyE'
   }, {
-    natural: 'd',
-    flat: 'e',
-    sharp: 'r'
+    natural: 'KeyD',
+    flat: 'KeyE',
+    sharp: 'KeyR'
   }, {
-    natural: 'f',
-    flat: 'r',
-    sharp: 't'
+    natural: 'KeyF',
+    flat: 'KeyR',
+    sharp: 'KeyT'
   }, {
-    natural: 'g',
-    flat: 't',
-    sharp: 'y'
+    natural: 'KeyG',
+    flat: 'KeyT',
+    sharp: 'KeyY'
   }, {
-    natural: 'h',
-    flat: 'y',
-    sharp: 'u'
+    natural: 'KeyH',
+    flat: 'KeyY',
+    sharp: 'KeyU'
   }, {
-    natural: 'j',
-    flat: 'u',
-    sharp: 'i'
+    natural: 'KeyJ',
+    flat: 'KeyU',
+    sharp: 'KeyI'
   }, {
-    natural: 'k',
-    flat: 'i',
-    sharp: 'o'
+    natural: 'KeyK',
+    flat: 'KeyI',
+    sharp: 'KeyO'
   }, {
-    natural: 'l',
-    flat: 'o',
-    sharp: 'p'
+    natural: 'KeyL',
+    flat: 'KeyO',
+    sharp: 'KeyP'
   }, {
-    natural: ';',
-    flat: 'p',
-    sharp: '['
+    natural: 'Semicolon',
+    flat: 'KeyP',
+    sharp: 'BracketLeft'
   }, {
-    natural: "'",
-    flat: '[',
-    sharp: ']'
+    natural: 'Quote',
+    flat: 'BracketLeft',
+    sharp: 'BracketRight'
   }],
   QWERTY_ROW: [{
-    natural: 'q',
-    flat: '1',
-    sharp: '2'
+    natural: 'KeyQ',
+    flat: 'Digit1',
+    sharp: 'Digit2'
   }, {
-    natural: 'w',
-    flat: '2',
-    sharp: '3'
+    natural: 'KeyW',
+    flat: 'Digit2',
+    sharp: 'Digit3'
   }, {
-    natural: 'e',
-    flat: '3',
-    sharp: '4'
+    natural: 'KeyE',
+    flat: 'Digit3',
+    sharp: 'Digit4'
   }, {
-    natural: 'r',
-    flat: '4',
-    sharp: '5'
+    natural: 'KeyR',
+    flat: 'Digit4',
+    sharp: 'Digit5'
   }, {
-    natural: 't',
-    flat: '5',
-    sharp: '6'
+    natural: 'KeyT',
+    flat: 'Digit5',
+    sharp: 'Digit6'
   }, {
-    natural: 'y',
-    flat: '6',
-    sharp: '7'
+    natural: 'KeyY',
+    flat: 'Digit6',
+    sharp: 'Digit7'
   }, {
-    natural: 'u',
-    flat: '7',
-    sharp: '8'
+    natural: 'KeyU',
+    flat: 'Digit7',
+    sharp: 'Digit8'
   }, {
-    natural: 'i',
-    flat: '8',
-    sharp: '9'
+    natural: 'KeyI',
+    flat: 'Digit8',
+    sharp: 'Digit9'
   }, {
-    natural: 'o',
-    flat: '9',
-    sharp: '0'
+    natural: 'KeyO',
+    flat: 'Digit9',
+    sharp: 'Digit0'
   }, {
-    natural: 'p',
-    flat: '0',
-    sharp: '-'
+    natural: 'KeyP',
+    flat: 'Digit0',
+    sharp: 'Minus'
   }, {
-    natural: '[',
-    flat: '-',
-    sharp: '='
+    natural: 'BracketLeft',
+    flat: 'Minus',
+    sharp: 'Equal'
   }]
 };
 

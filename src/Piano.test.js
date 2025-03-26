@@ -130,7 +130,7 @@ describe('<Piano />', () => {
       const lastNote = MidiNumbers.fromNote('c4');
       const mockPlayNote = jest.fn();
       const mockStopNote = jest.fn();
-      const keyboardShortcuts = [{ key: 'a', midiNumber: MidiNumbers.fromNote('c3') }];
+      const keyboardShortcuts = [{ code: 'KeyA', midiNumber: MidiNumbers.fromNote('c3') }];
 
       const wrapper = mount(
         <Piano
@@ -143,14 +143,14 @@ describe('<Piano />', () => {
 
       // Trigger window keydown with a mock event
       eventListenerCallbacks['keydown']({
-        key: 'a',
+        code: 'KeyA',
       });
 
       expect(mockPlayNote).toHaveBeenCalledTimes(1);
       expect(mockStopNote).toHaveBeenCalledTimes(0);
 
       eventListenerCallbacks['keyup']({
-        key: 'a',
+        code: 'KeyA',
       });
 
       expect(mockPlayNote).toHaveBeenCalledTimes(1);
